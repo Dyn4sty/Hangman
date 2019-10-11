@@ -5,7 +5,7 @@ import os
 from colorama import init, Fore, Back, Style
 from random import randint
 
-init()  # Enables colorama for Windows
+init()  # Enables colorama
 MAX_TRIES = 6
 num_of_tries = 0
 HANGMAN_ASCII_ART = (r"""
@@ -124,8 +124,8 @@ def check_valid_input(letter_guessed, old_letters_guessed,secret_word):
     :rtype: Boolean
     """
     letter_guessed = letter_guessed.lower()
-    if letter_guessed in string.ascii_letters or letter_guessed == secret_word:
-        if letter_guessed not in old_letters_guessed or letter_guessed == 'clear':
+    if letter_guessed == 'clear' or letter_guessed in string.ascii_letters or letter_guessed == secret_word:
+        if letter_guessed not in old_letters_guessed:
             return True
     else:
         return False
@@ -233,10 +233,15 @@ def main():
                 break
         if not game_status:
             print('GAME OVER')
+        play_again = input('Do u Want to play again? -> y/n ' + Fore.RESET)
+        if 'y' in play_again.lower(): main()
+
     except (KeyboardInterrupt):
         print('\n', 'Ctrl+C was clicked --> Exiting...')
+        os._exit(0)
     except EOFError:
         print('\n', 'Ctrl+Z was clicked --> Exiting...')
+        os._exit(0)
 
 
 if __name__ == "__main__":

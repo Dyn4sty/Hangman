@@ -5,7 +5,7 @@ import os
 from colorama import init, Fore, Back, Style
 from random import randint
 
-init()  # Enables colorama
+init()  # Enables colorama for windows
 MAX_TRIES = 6
 num_of_tries = 0
 HANGMAN_ASCII_ART = (r"""
@@ -18,56 +18,13 @@ HANGMAN_ASCII_ART = (r"""
 
 
 HANGMAN_PHOTOS = {
-    0: (Fore.RED + r"""x-------x """),
-    1: Fore.RED + (r"""
-     x-------x
-     |
-     |
-     |
-     |
-     |
-
-"""),
-    2: (Fore.GREEN + r"""
-     x-------x
-     |       |
-     |       0
-     |
-     |a
-     |
-"""),
-    3: (Fore.BLUE + r"""
-     x-------x
-     |       |
-     |       0
-     |       |
-     |
-     |
-"""),
-    4: (Fore.CYAN + r"""
-     x-------x
-     |       |
-     |       0
-     |      /|\
-     |
-     |
-"""),
-    5: Fore.RED + r"""
-x-------x
-|       |
-|       0
-|      /|\
-|      /
-|
-""",
-    6: Fore.LIGHTMAGENTA_EX + r"""
-    x-------x
-    |       |
-    |       0
-    |      /|\
-    |      / \
-    |
-""",
+    0: Fore.RED + """x-------x """,
+    1: Fore.RED + "x-------x\n|\n|\n|\n|",
+    2: Fore.GREEN + "x-------x\n|\t|\n|\t0\n|\n|\n|",
+    3: Fore.BLUE + "x-------x\n|\t|\n|\t0\n|\t|\n|\n|",
+    4: Fore.CYAN + "x-------x\n|\t|\n|\t0\n|\t\b /|" + "\\" + "\n|\n|",
+    5: Fore.RED + "x-------x\n|\t|\n|\t0\n|\t\b /|" + "\\" + "\n|\t\b/\n|",
+    6: Fore.LIGHTMAGENTA_EX + "x-------x\n|\t|\n|\t0\n|\t\b /|" + "\\" + "\n|\t\b/ \\\n|",
 }
 
 
@@ -200,7 +157,13 @@ def check_win(secret_word, old_letters_guessed):
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
-
+def play_again():
+    global num_of_tries
+    num_of_tries = 0 
+    play_again = input('Do u Want to play again? -> y/n ' ) # play again
+    if 'y' in play_again.lower():
+        print(Fore.RESET) 
+        main() 
 def Instructions():
     print("""
         Instructions
@@ -216,6 +179,7 @@ open_screen()
 Instructions()
 def main():
     try:
+        game_status = False
         file_path = input(r"Enter file path :")
         file_index = input("Enter index: ").lower()
         secret_word = choose_word(file_path, file_index)
@@ -233,8 +197,7 @@ def main():
                 break
         if not game_status:
             print('GAME OVER')
-        play_again = input('Do u Want to play again? -> y/n ' + Fore.RESET)
-        if 'y' in play_again.lower(): main()
+        play_again()
 
     except (KeyboardInterrupt):
         print('\n', 'Ctrl+C was clicked --> Exiting...')
@@ -245,5 +208,5 @@ def main():
 
 
 if __name__ == "__main__":
-
     main()
+

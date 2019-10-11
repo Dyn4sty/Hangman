@@ -5,7 +5,7 @@ import os
 from colorama import init, Fore, Back, Style
 from random import randint
 
-init()  # Enables colorama
+init()  # Enables colorama for Windows
 MAX_TRIES = 6
 num_of_tries = 0
 HANGMAN_ASCII_ART = (r"""
@@ -114,7 +114,7 @@ def choose_word(file_path, index):
         main()
 
 
-def check_valid_input(letter_guessed, old_letters_guessed):
+def check_valid_input(letter_guessed, old_letters_guessed,secret_word):
     """input vaildateor.
     :param letter_guessed: user's input letter
     :param old_letters_guessed: List of guessed letters
@@ -124,7 +124,7 @@ def check_valid_input(letter_guessed, old_letters_guessed):
     :rtype: Boolean
     """
     letter_guessed = letter_guessed.lower()
-    if len(letter_guessed) == 1 and letter_guessed in string.ascii_letters:
+    if letter_guessed in string.ascii_letters or letter_guessed == secret_word:
         if letter_guessed not in old_letters_guessed or letter_guessed == 'clear':
             return True
     else:
@@ -145,8 +145,8 @@ def try_update_letter_guessed(
     :return: True/False
     :rtype: Boolean
     """
-    if not check_valid_input(letter_guessed, old_letters_guessed):
-        print('X\n' + ' -> '.join(sorted(old_letters_guessed)))
+    if not check_valid_input(letter_guessed, old_letters_guessed,secret_word):
+        print('Invaild letter\n' + ' -> '.join(sorted(old_letters_guessed)))
     elif letter_guessed == 'clear':
         clear_screen()
     else:
@@ -154,15 +154,18 @@ def try_update_letter_guessed(
         if letter_guessed.lower() not in secret_word:
             old_letters_guessed.append(letter_guessed.lower())
             num_of_tries += 1
-            print(':(')
+            print('Wrong :(')
             print(print_hangman(num_of_tries))
             print(show_hidden_word(secret_word, old_letters_guessed))
 
         else:
+            if len(letter_guessed) > 1 and letter_guessed == secret_word:
+                new_list = [char for char in letter_guessed]
+                for item in new_list:
+                    old_letters_guessed.append(item)
             old_letters_guessed.append(letter_guessed.lower())
             print(show_hidden_word(secret_word, old_letters_guessed))
-        return num_of_tries
-
+            
 
 def print_hangman(num_of_tries):
     return (HANGMAN_PHOTOS[num_of_tries])

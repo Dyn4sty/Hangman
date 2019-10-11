@@ -4,10 +4,8 @@ import sys
 import os
 from colorama import init, Fore, Back, Style
 from random import randint
-
 init()  # Enables colorama for windows
 MAX_TRIES = 6
-num_of_tries = 0
 HANGMAN_ASCII_ART = (r"""
   /\  /\__ _ _ __   __ _ _ __ ___   __ _ _ __
  / /_/ / _` | '_ \ / _` | '_ ` _ \ / _` | '_ \
@@ -18,13 +16,13 @@ HANGMAN_ASCII_ART = (r"""
 
 
 HANGMAN_PHOTOS = {
-    0: Fore.RED + """x-------x """,
+    0: Fore.RED +"""x-------x """,
     1: Fore.RED + "x-------x\n|\n|\n|\n|",
-    2: Fore.GREEN + "x-------x\n|\t|\n|\t0\n|\n|\n|",
-    3: Fore.BLUE + "x-------x\n|\t|\n|\t0\n|\t|\n|\n|",
-    4: Fore.CYAN + "x-------x\n|\t|\n|\t0\n|\t\b /|" + "\\" + "\n|\n|",
-    5: Fore.RED + "x-------x\n|\t|\n|\t0\n|\t\b /|" + "\\" + "\n|\t\b/\n|",
-    6: Fore.LIGHTMAGENTA_EX + "x-------x\n|\t|\n|\t0\n|\t\b /|" + "\\" + "\n|\t\b/ \\\n|",
+    2: Fore.GREEN +"x-------x\n|\t|\n|\t0\n|\n|\n|",
+    3: Fore.BLUE +"x-------x\n|\t|\n|\t0\n|\t|\n|\n|",
+    4: Fore.CYAN +"x-------x\n|\t|\n|\t0\n|\t\b /|" +"\\" +"\n|\n|",
+    5: Fore.RED +"x-------x\n|\t|\n|\t0\n|\t\b /|" +"\\" +"\n|\t\b/\n|",
+    6: Fore.LIGHTMAGENTA_EX +"x-------x\n|\t|\n|\t0\n|\t\b /|" +"\\" +"\n|\t\b/ \\\n|",
 }
 
 
@@ -71,7 +69,7 @@ def choose_word(file_path, index):
         main()
 
 
-def check_valid_input(letter_guessed, old_letters_guessed,secret_word):
+def check_valid_input(letter_guessed, old_letters_guessed, secret_word):
     """input vaildateor.
     :param letter_guessed: user's input letter
     :param old_letters_guessed: List of guessed letters
@@ -88,26 +86,25 @@ def check_valid_input(letter_guessed, old_letters_guessed,secret_word):
         return False
 
 
-def try_update_letter_guessed(
-        letter_guessed,
-        old_letters_guessed,
-        secret_word):
-    """append the user's input.
+def try_update_letter_guessed(letter_guessed, old_letters_guessed, secret_word, num_of_tries):
+    """check user input and append it to a list, increment number of tries when failed
     :param letter_guessed: user's input letter
     :param old_letters_guessed: List of guessed letters
     :param secret_word: user's chosen word
     :type letter_guessed: string(char)
     :type old_letters_guessed: list
     :type secret_word: string
-    :return: True/False
-    :rtype: Boolean
+    :type num_of_tries: int
+    :return: num_of_tries
+    :rtype: int
     """
-    if not check_valid_input(letter_guessed, old_letters_guessed,secret_word):
+    if not check_valid_input(letter_guessed, old_letters_guessed, secret_word):
         print('Invaild letter\n' + ' -> '.join(sorted(old_letters_guessed)))
+        
     elif letter_guessed == 'clear':
         clear_screen()
+        
     else:
-        global num_of_tries
         if letter_guessed.lower() not in secret_word:
             old_letters_guessed.append(letter_guessed.lower())
             num_of_tries += 1
@@ -122,7 +119,8 @@ def try_update_letter_guessed(
                     old_letters_guessed.append(item)
             old_letters_guessed.append(letter_guessed.lower())
             print(show_hidden_word(secret_word, old_letters_guessed))
-            
+    return num_of_tries
+
 
 def print_hangman(num_of_tries):
     return (HANGMAN_PHOTOS[num_of_tries])
@@ -157,13 +155,11 @@ def check_win(secret_word, old_letters_guessed):
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
-def play_again():
-    global num_of_tries
-    num_of_tries = 0 
-    play_again = input('Do u Want to play again? -> y/n ' ) # play again
-    if 'y' in play_again.lower():
-        print(Fore.RESET) 
-        main() 
+
+#def play_again():
+    #print(Fore.RESET), main()
+
+
 def Instructions():
     print("""
         Instructions
@@ -175,30 +171,36 @@ clear - for cleaning the screen
 Ctrl+C - For exiting.
 -------------------------------\n""")
 
+
 open_screen()
 Instructions()
+
+
 def main():
     try:
-        game_status = False
-        file_path = input(r"Enter file path :")
+        num_of_tries = 0
+        file_path = input(r"Enter file path: ")
         file_index = input("Enter index: ").lower()
         secret_word = choose_word(file_path, file_index)
         old_letters_guessed = []
         print(f""" Let’s start! {print_hangman(num_of_tries)}""")
     except KeyboardInterrupt:
         print('\n', 'Ctrl+C was clicked --> Exiting...')
-        sys.exit()
+        os._exit(0)()
 
     try:
         while num_of_tries < MAX_TRIES:
-            try_update_letter_guessed(input("Enter a letter: "), old_letters_guessed, secret_word)
+            guess_input = input("Enter word/letter: ")
+            num_of_tries = try_update_letter_guessed(guess_input, old_letters_guessed, secret_word, num_of_tries)
             game_status = check_win(secret_word, old_letters_guessed)
             if game_status:
                 break
         if not game_status:
-            print('GAME OVER')
-        play_again()
-
+            print('GAME OVER\r\n')
+        if 'y' in input('Do u Want to play again? -> y/n '):
+            print(Fore.RESET), main()
+        else:
+            os._exit(0)
     except (KeyboardInterrupt):
         print('\n', 'Ctrl+C was clicked --> Exiting...')
         os._exit(0)
@@ -209,4 +211,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

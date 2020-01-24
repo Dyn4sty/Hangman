@@ -33,7 +33,7 @@ hangman game in python using wordlist file(example file in the repo)
            Instructions
     -------------------------------
     Type wordlist path:     #wordlist/words.txt
-    Type random in index for random word or an int for specific index.
+    Type `random` in the index input for random word, otherwise write a number(for specific word's index).
     // Useful Commands
     clear - for cleaning the screen
     Ctrl+C - For exiting.
